@@ -29,11 +29,15 @@ $container->set('config', function ($c) {
 });
 $container->set('redis', function ($c) {
     $params = [
-        'schema' => 'tcp',
+        'scheme' => $c->get('config')->get('redis.scheme', 'tcp'),
         'host' => $c->get('config')->get('redis.host'),
         'port' => $c->get('config')->get('redis.port')
     ];
-    return new Client($params);
+    $options = [];
+    if ($password = $c->get('config')->get('redis.password', null)) {
+        $options['parameters'] = ['password' => $password];
+    }
+    return new Client($params, $options);
 });
 $container->set('guzzle', function () {
     return new \GuzzleHttp\Client();
